@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rentify/admin/admin_login.dart';
+import 'package:rentify/admin/admin_screen.dart';
 // import 'package:rentify/features/auth/screen/fingerprint_screen.dart';
 import 'package:rentify/features/auth/screen/login_screen.dart';
 import 'package:rentify/features/dashboard.dart/dashboard_screen.dart';
@@ -14,12 +16,16 @@ import 'core/common/loader.dart';
 import 'features/auth/controller/auth_controller.dart';
 import 'firebase_options.dart';
 import 'models/user_models.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(
     const ProviderScope(
       child: MyApp(),
@@ -67,6 +73,22 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     return ref.watch(authStateProvider).when(
           data: (data) {
+            if (kIsWeb) {
+              return ScreenUtilInit(
+                designSize: const Size(1366, 768),
+                child: MaterialApp(
+                  debugShowCheckedModeBanner: false,
+                  title: 'RENTIFY',
+                  theme: ThemeData(
+                    colorScheme:
+                        ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+                    useMaterial3: true,
+                  ),
+                  // onGenerateRoute: (settings) => generateRoute(settings),
+                  home: const AdminLoginScreen(),
+                ),
+              );
+            }
             if (data != null) {
               getData(ref, data);
               if (userModel != null) {
@@ -97,7 +119,9 @@ class _MyAppState extends ConsumerState<MyApp> {
             }
             return const Loader();
           },
-          error: (error, stackTrace) => ErrorText(errorText: error.toString()),
+          error: (error, stackTrace) {
+            return ErrorText(errorText: error.toString());
+          },
           loading: () => const Loader(),
         );
   }

@@ -1,25 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rentify/features/add_product/controller/product_controller.dart';
+import 'package:rentify/features/rental/screens/widget/rentals_detail.dart';
 
 import '../../../core/common/error_text.dart';
 import '../../../core/common/loader.dart';
 import '../../../models/product.dart';
-import '../../add_product/controller/product_controller.dart';
 import '../../auth/controller/auth_controller.dart';
 
-class FavoriteScreen extends ConsumerWidget {
-  const FavoriteScreen({super.key});
+class RentalsScreen extends ConsumerStatefulWidget {
+  const RentalsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _RentalsScreenState();
+}
+
+class _RentalsScreenState extends ConsumerState<RentalsScreen> {
+  List<Product> items = [];
+
+  @override
+  Widget build(BuildContext context) {
     var user = ref.read(userProvider);
-    List<Product> items = [];
+
     return ref.watch(renalPostsProvider).when(
           data: (data) {
             //case if the user is logged in
             items.clear();
             for (var d in data) {
-              if (user!.favorite.contains(d.id)) {
+              if (d.ownerId == user!.id) {
                 items.add(d);
               }
             }
@@ -36,10 +44,10 @@ class FavoriteScreen extends ConsumerWidget {
                 // Create a grid item for each index
                 return GestureDetector(
                   onTap: () {
-                    // Navigator.of(context).pushNamed(
-                    //   RentalsDetailScreen.routeName,
-                    //   arguments: items[index],
-                    // );
+                    Navigator.of(context).pushNamed(
+                      RentalsDetailScreen.routeName,
+                      arguments: items[index],
+                    );
                   },
                   child: Material(
                     elevation: 2,

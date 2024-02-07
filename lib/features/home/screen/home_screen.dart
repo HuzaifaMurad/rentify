@@ -8,6 +8,7 @@ import 'package:rentify/features/add_product/controller/product_controller.dart'
 import 'package:rentify/features/home/screen/product_detail_screen.dart';
 
 import 'package:rentify/features/home/widgets/home_item.dart';
+import 'package:rentify/features/home/widgets/search_delegate_home.dart';
 
 import '../../../core/common/error_text.dart';
 import '../../../core/common/loader.dart';
@@ -32,14 +33,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return ref.watch(renalPostsProvider).when(
           data: (data) {
-            // for (var d in data) {
-            //   if (selectedCategory == 'All') {
-            //     items.add(d);
-            //   } else if (selectedCategory == d.category) {
-            //     items = [];
-            //     items.add(d);
-            //   }
-            // }
             return Scaffold(
               backgroundColor: Constants.scaffoldbackgroundColor2,
               body: SafeArea(
@@ -47,7 +40,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
-                      const SearchBarHome(),
+                      GestureDetector(
+                        onTap: () async {
+                          await showSearch<Product>(
+                            context: context,
+                            delegate: HomeSearchDelegate(data),
+                          );
+                        },
+                        child: const SearchBarHome(),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -132,24 +133,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     imageUrls: data[index].images,
                                     location: data[index].location!,
                                     title: data[index].title!,
+                                    id: data[index].id!,
                                     price: data[index].price.toString(),
                                   ));
                             } else if (selectedCategory ==
                                 data[index].category) {
                               var selected = data[index];
                               return GestureDetector(
-                                  onTap: () => Navigator.of(context).pushNamed(
-                                        ProductDetailScreen.routeName,
-                                        arguments: selected,
-                                      ),
-                                  child: HomeItem(
-                                    address: selected.address!,
-                                    category: selected.category!,
-                                    imageUrls: selected.images,
-                                    location: selected.location!,
-                                    title: selected.title!,
-                                    price: selected.price.toString(),
-                                  ));
+                                onTap: () => Navigator.of(context).pushNamed(
+                                  ProductDetailScreen.routeName,
+                                  arguments: selected,
+                                ),
+                                child: HomeItem(
+                                  address: selected.address!,
+                                  category: selected.category!,
+                                  imageUrls: selected.images,
+                                  location: selected.location!,
+                                  title: selected.title!,
+                                  id: selected.id!,
+                                  price: selected.price.toString(),
+                                ),
+                              );
                             }
                             return Container();
                           },
@@ -162,6 +166,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             );
           },
           error: (error, stackTrace) {
+            print(error);
             return ErrorText(
               errorText: error.toString(),
             );

@@ -16,6 +16,7 @@ class SearchBarHome extends StatelessWidget {
       child: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 10),
         child: TextField(
+          enabled: false,
           decoration: InputDecoration(
             hintText: 'Search',
             prefixIcon: Icon(Icons.search),

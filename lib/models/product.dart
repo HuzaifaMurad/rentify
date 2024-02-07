@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Product {
   final String? id;
   final String? title;
@@ -8,8 +10,8 @@ class Product {
   final double price;
   final List<String> images; // URLs or paths to product images
   final String? category;
-  final bool? isAvailable;
-  final String? postedDate;
+  bool? isAvailable;
+  final DateTime? postedDate;
   final String? location;
   final String? address;
   final String? ownerId;
@@ -61,7 +63,7 @@ class Product {
       images: List<String>.from(map['images']),
       category: map['category'],
       isAvailable: map['isAvailable'],
-      postedDate: map['postedDate'],
+      postedDate: (map['postedDate'] as Timestamp).toDate(),
       location: map['location'],
       address: map['address'],
       ownerId: map['ownerId'],
@@ -78,5 +80,37 @@ class Product {
   @override
   String toString() {
     return 'Product(id: $id, title: $title, description: $description, price: $price, images: $images, category: $category, isAvailable: $isAvailable, postedDate: $postedDate, location: $location, address: $address, ownerId: $ownerId, ownerName: $ownerName, ownerContact: $ownerContact)';
+  }
+
+  Product copyWith({
+    String? id,
+    String? title,
+    String? description,
+    double? price,
+    List<String>? images,
+    String? category,
+    bool? isAvailable,
+    DateTime? postedDate,
+    String? location,
+    String? address,
+    String? ownerId,
+    String? ownerName,
+    String? ownerContact,
+  }) {
+    return Product(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      price: price ?? this.price,
+      images: images ?? this.images,
+      category: category ?? this.category,
+      isAvailable: isAvailable ?? this.isAvailable,
+      postedDate: postedDate ?? this.postedDate,
+      location: location ?? this.location,
+      address: address ?? this.address,
+      ownerId: ownerId ?? this.ownerId,
+      ownerName: ownerName ?? this.ownerName,
+      ownerContact: ownerContact ?? this.ownerContact,
+    );
   }
 }

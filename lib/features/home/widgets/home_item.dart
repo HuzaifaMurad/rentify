@@ -2,8 +2,12 @@ import 'dart:developer';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeItem extends StatefulWidget {
+import '../../auth/controller/auth_controller.dart';
+import '../../user_profile/controller/user_profile_controller.dart';
+
+class HomeItem extends ConsumerStatefulWidget {
   const HomeItem(
       {super.key,
       required this.imageUrls,
@@ -11,6 +15,7 @@ class HomeItem extends StatefulWidget {
       required this.category,
       required this.location,
       required this.price,
+      required this.id,
       required this.address});
   final List<String> imageUrls;
   final String title;
@@ -18,21 +23,30 @@ class HomeItem extends StatefulWidget {
   final String location;
   final String address;
   final String price;
+  final String id;
 
   @override
-  State<HomeItem> createState() => _HomeItemState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _HomeItemState();
 }
 
-class _HomeItemState extends State<HomeItem> {
+class _HomeItemState extends ConsumerState<HomeItem> {
   final List<String> imageUrls = [
     'https://a.storyblok.com/f/181238/820x547/d3eff61502/weekendje_weg_820x847.jpg',
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/195731211.jpg?k=42b4c492410d148eb82f701fb39f461241151776ef79b5ba2b00a0833c3f4118&o=&hp=1',
     'https://a.storyblok.com/f/181238/900x600/18b8c8334d/41141.png',
   ];
   int _currentIndex = 0;
+
+  void updateFavorite(String id, String uid) {
+    ref
+        .read(userProfileControllerProvider.notifier)
+        .updateUserFavorite(id, uid);
+  }
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
+    var user = ref.watch(userProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Column(
@@ -99,10 +113,14 @@ class _HomeItemState extends State<HomeItem> {
                 right: 10,
                 top: 10,
                 child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
+                  onPressed: () {
+                    updateFavorite(widget.id, user.id);
+                  },
+                  icon: Icon(
                     Icons.favorite,
-                    color: Colors.white,
+                    color: user!.favorite.contains(widget.id)
+                        ? Colors.red
+                        : Colors.white,
                   ),
                 ),
               )

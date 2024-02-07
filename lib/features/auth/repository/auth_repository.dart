@@ -67,6 +67,10 @@ class AuthRepository {
           email: userCredential.user!.email!,
           fingerPrint: '',
           phoneNo: userCredential.user!.phoneNumber ?? '',
+          favorite: [
+            '',
+          ],
+          reviews: null,
         );
         await users.doc(userCredential.user!.uid).set(userModel.toMap());
       } else {
@@ -117,6 +121,10 @@ class AuthRepository {
         email: userCredential.user!.email!,
         fingerPrint: 'no data',
         phoneNo: phone,
+        favorite: [
+          '',
+        ],
+        reviews: null,
       );
       await users.doc(userCredential.user!.uid).set(userModel.toMap());
 
@@ -156,10 +164,28 @@ class AuthRepository {
           // Document does not exist or data is null
           return null;
         }
+
         // Safely cast the data to Map<String, dynamic> and create a UserModel
         return UserModel.fromMap(data as Map<String, dynamic>);
       },
     );
+  }
+
+  Future<UserModel?> getSpecificUserData(String uid) async {
+    try {
+      DocumentSnapshot documentSnapshot = await users.doc(uid).get();
+      final data = documentSnapshot.data();
+      if (data == null) {
+        // Document does not exist or data is null
+        return null;
+      }
+      log(data.toString());
+      // Safely cast the data to Map<String, dynamic> and create a UserModel
+      return UserModel.fromMap(data as Map<String, dynamic>);
+    } catch (e) {
+      log('Error fetching user data: $e');
+      return null;
+    }
   }
 
   void signOut() async {

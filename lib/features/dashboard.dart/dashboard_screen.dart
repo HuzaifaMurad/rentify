@@ -5,7 +5,7 @@ import 'package:rentify/features/add_product/screen/add_product.dart';
 import 'package:rentify/features/chat/screens/chat_screen.dart';
 import 'package:rentify/features/dashboard.dart/widget/navbar_customIcon.dart';
 import 'package:rentify/features/home/screen/home_screen.dart';
-import 'package:rentify/features/rental/screens/rental_screen.dart';
+import 'package:rentify/features/rental/screens/retals_screen.dart';
 import 'package:rentify/features/user_profile/screen/profile_screen.dart';
 
 import '../../core/utility.dart';
@@ -64,7 +64,7 @@ class _DashBoardState extends State<DashBoard> {
               label: 'home'),
           BottomNavigationBarItem(
               icon: Icon(
-                Icons.star_border,
+                Icons.star,
                 size: 30,
               ),
               label: 'Retals'),

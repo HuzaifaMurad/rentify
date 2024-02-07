@@ -81,16 +81,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    fullNameController.dispose();
-    emailController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
-    phonenoController.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -299,14 +289,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       ),
     );
   }
-}
 
-//  CircleAvatar(
-//                   radius: 45,
-//                   backgroundColor: const Color(0xff81A8A6),
-//                   backgroundImage: profileImage != null
-//                       ? FileImage(profileImage!)
-//                       : const AssetImage(
-//                           'assets/images/profile.png',
-//                         ) as ImageProvider<Object>?,
-//                 )
+  @override
+  void dispose() {
+    super.dispose();
+    fullNameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    phonenoController.dispose();
+  }
+}

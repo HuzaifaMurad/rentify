@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:rentify/core/utility.dart';
 
 import '../../../models/user_models.dart';
@@ -65,6 +66,10 @@ class AuthController extends StateNotifier<bool> {
 
   Stream<UserModel?> getUSerData(String uid) {
     return _authRepository.getUserData(uid);
+  }
+
+  Future<UserModel?> getSpecificUserData(String uid) {
+    return _authRepository.getSpecificUserData(uid);
   }
 
   void signOut() async {

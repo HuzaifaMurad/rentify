@@ -28,6 +28,10 @@ class Constants {
 
   static List<String> condition = ['New', 'Used', 'slightly Used'];
 
+  static List<String> statuses = [
+    'True',
+    'False',
+  ];
   static var titleRentify =
       GoogleFonts.raleway(fontSize: 17, fontWeight: FontWeight.w500);
   static var authText = GoogleFonts.deliusSwashCaps(

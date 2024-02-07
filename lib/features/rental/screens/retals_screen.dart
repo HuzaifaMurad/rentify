@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rentify/features/rental/screens/favortie_screen.dart';
+import 'package:rentify/features/rental/screens/rentals_screen.dart';
 
 import '../../../core/constants/constants.dart';
 
@@ -41,7 +42,7 @@ class _RentalScreenState extends ConsumerState<RentalScreen> {
         body: const TabBarView(
           children: [
             FavoriteScreen(),
-            Center(child: Text('Tab 2 Content')),
+            RentalsScreen(),
           ],
         ),
       ),

@@ -78,7 +78,7 @@ class ProductController extends StateNotifier<bool> {
             images: url,
             category: selectedCategory,
             isAvailable: true,
-            postedDate: formattedDate,
+            postedDate: myDate,
             location: location,
             ownerId: user.id,
             address: city,
@@ -90,6 +90,38 @@ class ProductController extends StateNotifier<bool> {
           showSnackBar(context, 'Posted Successfully');
           // Routemaster.of(context).pop();
         });
+      },
+    );
+  }
+
+  void editProfile({
+    required Product product,
+    required BuildContext context,
+  }) async {
+    state = true;
+
+    product = product.copyWith(
+      address: product.address,
+      category: product.category,
+      description: product.description,
+      id: product.id,
+      images: product.images,
+      isAvailable: product.isAvailable,
+      location: product.location,
+      ownerContact: product.ownerContact,
+      ownerId: product.ownerId,
+      ownerName: product.ownerName,
+      postedDate: product.postedDate,
+      price: product.price,
+      title: product.title,
+    );
+    final res = await _addProductRepository.updateProduct(product);
+    state = false;
+    res.fold(
+      (l) => showSnackBar(context, l.message),
+      (r) {
+        // _ref.read(userProvider.notifier).update((state) => user);
+        Navigator.of(context).pop();
       },
     );
   }

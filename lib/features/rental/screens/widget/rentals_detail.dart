@@ -5,12 +5,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:rentify/features/add_product/screen/Edit_product.dart';
 import 'package:rentify/features/home/screen/user_details_scrreen.dart';
 import 'package:rentify/models/product.dart';
 
-class ProductDetailScreen extends ConsumerStatefulWidget {
-  static const routeName = '/product-detail-screen';
-  const ProductDetailScreen({
+import '../../../../core/constants/constants.dart';
+import '../../../home/screen/product_detail_screen.dart';
+
+class RentalsDetailScreen extends ConsumerStatefulWidget {
+  static const routeName = '/rentals-detail-screen';
+  const RentalsDetailScreen({
     super.key,
     required this.product,
   });
@@ -18,15 +23,15 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
-      _ProductDetailScreenState();
+      _RentalsDetailScreenState();
 }
 
-class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
-  final List<String> imageUrls = [
-    'https://a.storyblok.com/f/181238/820x547/d3eff61502/weekendje_weg_820x847.jpg',
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/195731211.jpg?k=42b4c492410d148eb82f701fb39f461241151776ef79b5ba2b00a0833c3f4118&o=&hp=1',
-    'https://a.storyblok.com/f/181238/900x600/18b8c8334d/41141.png',
-  ];
+class _RentalsDetailScreenState extends ConsumerState<RentalsDetailScreen> {
+  // final List<String> imageUrls = [
+  //   'https://a.storyblok.com/f/181238/820x547/d3eff61502/weekendje_weg_820x847.jpg',
+  //   'https://cf.bstatic.com/xdata/images/hotel/max1024x768/195731211.jpg?k=42b4c492410d148eb82f701fb39f461241151776ef79b5ba2b00a0833c3f4118&o=&hp=1',
+  //   'https://a.storyblok.com/f/181238/900x600/18b8c8334d/41141.png',
+  // ];
   int _currentIndex = 0;
   @override
   Widget build(BuildContext context) {
@@ -75,7 +80,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: widget.product.images.map((url) {
-                          int rindex = imageUrls.indexOf(url);
+                          int rindex = widget.product.images.indexOf(url);
 
                           return Container(
                             width: 10.0,
@@ -115,66 +120,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                 ),
                               ),
                             ),
-                            Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(
-                                    CupertinoIcons.download_circle,
-                                    color: Color(0xff004D5E),
-                                    size: 30,
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Phone No:'),
-                                          content: Text(
-                                            widget.product.ownerContact!.isEmpty
-                                                ? 'no contact info'
-                                                : widget.product.ownerContact
-                                                    .toString(),
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: Text('OK'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                  icon: const Icon(
-                                    Icons.phone,
-                                    color: Color(0xff004D5E),
-                                    size: 30,
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pushNamed(
-                                      UserDetasilsScreen.routeName,
-                                      arguments: widget.product.ownerId,
-                                    );
-                                  },
-                                  icon: const Icon(
-                                    Icons.person,
-                                    color: Color(0xff004D5E),
-                                    size: 30,
-                                  ),
-                                ),
-                              ],
-                            )
                           ],
                         ),
                       ),
@@ -260,7 +205,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           const SizedBox(
                             height: 10,
                           ),
-                          Row(
+                          const Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               SizedBox(
@@ -269,27 +214,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                 child: Card(
                                   elevation: 5,
                                   surfaceTintColor: Colors.white,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        widget.product.isAvailable!
-                                            ? Icons.event_available
-                                            : Icons.dangerous,
-                                        size: 30,
-                                        color: widget.product.isAvailable!
-                                            ? Colors.green
-                                            : Colors.red,
-                                      ),
-                                      Text(
-                                        widget.product.isAvailable!
-                                            ? 'Available'
-                                            : 'UnAvailable',
-                                      ),
-                                    ],
-                                  ),
                                 ),
                               ),
                               SizedBox(
@@ -320,63 +244,49 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          const Text(
-                            'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using \'Content here, content here\', making it look like readable English',
-                            style: TextStyle(
+                          Text(
+                            widget.product.description.toString(),
+                            style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w400,
                               color: Colors.grey,
                             ),
+                          ),
+                          SizedBox(
+                            height: 35,
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 60,
-                          color: const Color(0xffF5F5F5),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Rs ${widget.product.price}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 23,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          alignment: Alignment.center,
-                          height: 60,
-                          decoration: const BoxDecoration(
-                            borderRadius:
-                                BorderRadius.only(topLeft: Radius.circular(20)),
-                            color: Color(0xff0BBDE9),
-                          ),
-                          child: const Text(
-                            'Book Now',
-                            style: TextStyle(
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
               ],
             ),
           ),
+          InkWell(
+            onTap: () {
+              Navigator.of(context).pushNamed(
+                EditProductScreen.routeName,
+                arguments: widget.product,
+              );
+            },
+            child: Container(
+              height: 70,
+              width: double.infinity,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                gradient: Constants.buttonGredient,
+              ),
+              child: Text(
+                'Edit Product',
+                style: GoogleFonts.raleway(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          )
         ],
       ),
     );

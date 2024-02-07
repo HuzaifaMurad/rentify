@@ -36,6 +36,20 @@ class AddProductRepository {
     }
   }
 
+  FutureVoid updateProduct(Product product) async {
+    try {
+      return right(
+        _posts.doc(product.id).update(product.toMap()),
+      );
+    } on FirebaseException catch (e) {
+      throw e.message!;
+    } catch (e) {
+      return left(
+        Failure(e.toString()),
+      );
+    }
+  }
+
   Stream<List<Product>> fetchRentalProduct() {
     var ss = _posts.orderBy('postedDate', descending: true).snapshots().map(
           (event) => event.docs

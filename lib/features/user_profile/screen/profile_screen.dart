@@ -35,9 +35,10 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 Text(
                   user.name,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.w600),
                 ),
-                Text(
+                const Text(
                   'Account Detail',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                 ),
