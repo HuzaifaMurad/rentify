@@ -71,6 +71,8 @@ class AuthRepository {
             '',
           ],
           reviews: null,
+          status: 'active',
+          report: null,
         );
         await users.doc(userCredential.user!.uid).set(userModel.toMap());
       } else {
@@ -114,18 +116,19 @@ class AuthRepository {
 
       UserModel? userModel;
       userModel = UserModel(
-        id: userCredential.user!.uid,
-        name: name, // You can prompt the user to set their name later
-        profilePic:
-            profileImage != null ? profileImage! : Constants.avatarDefault,
-        email: userCredential.user!.email!,
-        fingerPrint: 'no data',
-        phoneNo: phone,
-        favorite: [
-          '',
-        ],
-        reviews: null,
-      );
+          id: userCredential.user!.uid,
+          name: name, // You can prompt the user to set their name later
+          profilePic:
+              profileImage != null ? profileImage! : Constants.avatarDefault,
+          email: userCredential.user!.email!,
+          fingerPrint: 'no data',
+          phoneNo: phone,
+          favorite: [
+            '',
+          ],
+          reviews: null,
+          report: null,
+          status: 'active');
       await users.doc(userCredential.user!.uid).set(userModel.toMap());
 
       return right(userModel);

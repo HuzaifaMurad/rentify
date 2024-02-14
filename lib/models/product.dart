@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rentify/models/report.dart';
 
 class Product {
   final String? id;
@@ -17,6 +18,10 @@ class Product {
   final String? ownerId;
   final String? ownerName;
   final String? ownerContact;
+  final String? status;
+  final int? reports;
+  final List<Report>? report;
+  final List<String>? view;
 
   Product({
     required this.id,
@@ -32,6 +37,10 @@ class Product {
     required this.ownerId,
     required this.ownerName,
     required this.ownerContact,
+    required this.status,
+    required this.reports,
+    required this.report,
+    required this.view,
   });
 
   // Convert Product object to a map
@@ -50,11 +59,20 @@ class Product {
       'ownerId': ownerId,
       'ownerName': ownerName,
       'ownerContact': ownerContact,
+      'reports': reports,
+      'status': status,
+      'report': report?.map((report) => report.toMap()).toList(),
+      'view': view,
     };
   }
 
   // Create a Product object from a map
   factory Product.fromMap(Map<String, dynamic> map) {
+    List<Report> reviewList =
+        (map['report'] as List<dynamic>?)?.map((reportMap) {
+              return Report.fromMap(reportMap);
+            }).toList() ??
+            [];
     return Product(
       id: map['id'],
       title: map['title'],
@@ -69,6 +87,10 @@ class Product {
       ownerId: map['ownerId'],
       ownerName: map['ownerName'],
       ownerContact: map['ownerContact'],
+      reports: map['reports'],
+      status: map['status'],
+      report: reviewList,
+      view: List<String>.from(map['view']),
     );
   }
 
@@ -96,21 +118,28 @@ class Product {
     String? ownerId,
     String? ownerName,
     String? ownerContact,
+    int? reports,
+    String? status,
+    List<Report>? report,
+    List<String>? view,
   }) {
     return Product(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      price: price ?? this.price,
-      images: images ?? this.images,
-      category: category ?? this.category,
-      isAvailable: isAvailable ?? this.isAvailable,
-      postedDate: postedDate ?? this.postedDate,
-      location: location ?? this.location,
-      address: address ?? this.address,
-      ownerId: ownerId ?? this.ownerId,
-      ownerName: ownerName ?? this.ownerName,
-      ownerContact: ownerContact ?? this.ownerContact,
-    );
+        id: id ?? this.id,
+        title: title ?? this.title,
+        description: description ?? this.description,
+        price: price ?? this.price,
+        images: images ?? this.images,
+        category: category ?? this.category,
+        isAvailable: isAvailable ?? this.isAvailable,
+        postedDate: postedDate ?? this.postedDate,
+        location: location ?? this.location,
+        address: address ?? this.address,
+        ownerId: ownerId ?? this.ownerId,
+        ownerName: ownerName ?? this.ownerName,
+        ownerContact: ownerContact ?? this.ownerContact,
+        reports: reports ?? this.reports,
+        status: status ?? this.status,
+        view: view,
+        report: report);
   }
 }

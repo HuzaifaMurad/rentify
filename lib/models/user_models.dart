@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:rentify/models/report.dart';
 import 'package:rentify/models/review.dart';
 
 // ignore_for_file: public_member_api_docs, sort_constructors_first
@@ -12,6 +13,8 @@ class UserModel {
   final String fingerPrint;
   final List<String> favorite;
   List<Review>? reviews;
+  final String? status;
+  final List<Report>? report;
 
   UserModel({
     required this.id,
@@ -22,6 +25,8 @@ class UserModel {
     required this.fingerPrint,
     required this.favorite,
     required this.reviews,
+    required this.status,
+    required this.report,
   });
 
   Map<String, dynamic> toMap() {
@@ -34,6 +39,8 @@ class UserModel {
       'fingerPrint': fingerPrint,
       'favorite': favorite,
       'reviews': reviews?.map((review) => review.toMap()).toList(),
+      'status': status,
+      'report': report?.map((report) => report.toMap()).toList(),
     };
   }
 
@@ -48,6 +55,11 @@ class UserModel {
               return Review.fromMap(reviewMap);
             }).toList() ??
             [];
+    List<Report> reportList =
+        (map['report'] as List<dynamic>?)?.map((reportMap) {
+              return Report.fromMap(reportMap);
+            }).toList() ??
+            [];
     return UserModel(
       id: map['id'] as String,
       name: map['name'] ?? "",
@@ -57,6 +69,8 @@ class UserModel {
       fingerPrint: map['fingerPrint'] ?? "",
       favorite: favoriteList,
       reviews: reviewList,
+      status: map['status'],
+      report: reportList,
     );
   }
 
@@ -79,16 +93,19 @@ class UserModel {
     String? fingerPrint,
     List<String>? favorite,
     List<Review>? reviews,
+    String? status,
+    List<Report>? report,
   }) {
     return UserModel(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      email: email ?? this.email,
-      phoneNo: phoneNo ?? this.phoneNo,
-      profilePic: profilePic ?? this.profilePic,
-      fingerPrint: fingerPrint ?? this.fingerPrint,
-      favorite: favorite ?? this.favorite,
-      reviews: reviews ?? this.reviews,
-    );
+        id: id ?? this.id,
+        name: name ?? this.name,
+        email: email ?? this.email,
+        phoneNo: phoneNo ?? this.phoneNo,
+        profilePic: profilePic ?? this.profilePic,
+        fingerPrint: fingerPrint ?? this.fingerPrint,
+        favorite: favorite ?? this.favorite,
+        reviews: reviews ?? this.reviews,
+        status: status ?? this.status,
+        report: report);
   }
 }

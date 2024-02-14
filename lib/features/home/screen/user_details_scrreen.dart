@@ -12,6 +12,7 @@ import 'package:rentify/models/review.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
 import '../../../models/product.dart';
+import '../../../models/report.dart';
 import '../../../models/user_models.dart';
 import '../../add_product/controller/product_controller.dart';
 import '../../auth/controller/auth_controller.dart';
@@ -32,6 +33,7 @@ class _UserDetasilsScreenState extends ConsumerState<UserDetasilsScreen> {
   bool isReview = true;
   bool isLoading = true;
   final TextEditingController controller = TextEditingController();
+  final TextEditingController reportController = TextEditingController();
   double? rating;
   double sum = 0;
   int length = 0;
@@ -41,22 +43,127 @@ class _UserDetasilsScreenState extends ConsumerState<UserDetasilsScreen> {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
+  UserModel? userModel;
+  static bool isUserReported(List<Report> reports, String userId) {
+    for (var report in reports) {
+      if (report.userId == userId) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  UserModel? userModel;
+  void addReport(BuildContext context) {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            children: [
+              const Text(
+                'Give Reason For Report',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Material(
+                elevation: 5,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: AddProdTextField(
+                    title: 'Reason of report',
+                    maxlines: 5,
+                    color: Colors.white,
+                    controller: reportController,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    if (reportController.text.isEmpty) {
+                      ScaffoldMessenger.of(context)
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(
+                          SnackBar(
+                            content: const Text('Give reason'),
+                            margin: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).size.height * 0.6,
+                              left: 30,
+                              right: 30,
+                            ),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      return;
+                    }
+
+                    var user = ref.read(userProvider);
+
+                    if (userModel?.report != null) {
+                      if (isUserReported(userModel!.report!, user!.id)) {
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(
+                            SnackBar(
+                              content: const Text('already report submitted'),
+                              margin: EdgeInsets.only(
+                                bottom:
+                                    MediaQuery.of(context).size.height * 0.6,
+                                left: 30,
+                                right: 30,
+                              ),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        return;
+                      }
+                    }
+
+                    Report report =
+                        Report(userId: user!.id, reason: reportController.text);
+
+                    ref.read(userProfileControllerProvider.notifier).reportUser(
+                        id: userModel!.id, report: report, context: context);
+                  },
+                  child: Container(
+                    height: 50,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: Constants.buttonGredient,
+                    ),
+                    child: Text(
+                      'SUBMIT',
+                      style: GoogleFonts.raleway(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   void getData() async {
     userModel = await ref
         .read(authControllerProvider.notifier)
         .getSpecificUserData(widget.id);
-    if (userModel!.reviews != null) {
-      sum = calculateAverageRating(userModel!.reviews!);
-    }
-    log(sum.toString());
 
     isLoading = false;
 
@@ -236,7 +343,7 @@ class _UserDetasilsScreenState extends ConsumerState<UserDetasilsScreen> {
               return [
                 const PopupMenuItem<String>(
                   value: 'Report User',
-                  child: Text('Option 1'),
+                  child: Text('Report'),
                 ),
                 const PopupMenuItem<String>(
                   value: 'Report Product',
@@ -247,7 +354,8 @@ class _UserDetasilsScreenState extends ConsumerState<UserDetasilsScreen> {
             },
             onSelected: (String value) {
               // Handle item selection here
-              print('Selected: $value');
+
+              addReport(context);
             },
           ),
         ],
@@ -519,5 +627,12 @@ class _UserDetasilsScreenState extends ConsumerState<UserDetasilsScreen> {
               ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    reportController.dispose();
+    super.dispose();
   }
 }

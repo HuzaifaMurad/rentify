@@ -5,8 +5,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:rentify/core/constants/constants.dart';
+import 'package:rentify/features/add_product/controller/product_controller.dart';
 import 'package:rentify/features/home/screen/user_details_scrreen.dart';
 import 'package:rentify/models/product.dart';
+
+import '../../../models/report.dart';
+import '../../add_product/widgets/addprod_textfield.dart';
+import '../../auth/controller/auth_controller.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   static const routeName = '/product-detail-screen';
@@ -22,6 +29,145 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
+  final TextEditingController controller = TextEditingController();
+
+  @override
+  void initState() {
+    addView();
+    super.initState();
+  }
+
+  void addView() {
+    var user = ref.read(userProvider);
+
+    Future.delayed(
+      const Duration(seconds: 2),
+      () {
+        ref.read(addProductControllerProvider.notifier).updateView(
+            id: widget.product.id!, userid: user!.id, context: context);
+      },
+    );
+  }
+
+  void addReport(BuildContext context) {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            children: [
+              const Text(
+                'Give Reason For Report',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Material(
+                elevation: 5,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: AddProdTextField(
+                    title: 'Reason of report',
+                    maxlines: 5,
+                    color: Colors.white,
+                    controller: controller,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    if (controller.text.isEmpty) {
+                      ScaffoldMessenger.of(context)
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(
+                          SnackBar(
+                            content: const Text('Give reason'),
+                            margin: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).size.height * 0.6,
+                              left: 30,
+                              right: 30,
+                            ),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      return;
+                    }
+
+                    var user = ref.read(userProvider);
+                    if (widget.product.report != null) {
+                      if (isUserReported(widget.product.report!, user!.id)) {
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(
+                            SnackBar(
+                              content: const Text('already report submitted'),
+                              margin: EdgeInsets.only(
+                                bottom:
+                                    MediaQuery.of(context).size.height * 0.6,
+                                left: 30,
+                                right: 30,
+                              ),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        return;
+                      }
+                    }
+
+                    Report report =
+                        Report(userId: user!.id, reason: controller.text);
+
+                    ref
+                        .read(addProductControllerProvider.notifier)
+                        .reportProduct(
+                            id: widget.product.id!,
+                            report: report,
+                            context: context);
+                  },
+                  child: Container(
+                    height: 50,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: Constants.buttonGredient,
+                    ),
+                    child: Text(
+                      'SUBMIT',
+                      style: GoogleFonts.raleway(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  static bool isUserReported(List<Report> reports, String userId) {
+    for (var report in reports) {
+      if (report.userId == userId) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   final List<String> imageUrls = [
     'https://a.storyblok.com/f/181238/820x547/d3eff61502/weekendje_weg_820x847.jpg',
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/195731211.jpg?k=42b4c492410d148eb82f701fb39f461241151776ef79b5ba2b00a0833c3f4118&o=&hp=1',
@@ -292,21 +438,55 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                   ),
                                 ),
                               ),
-                              SizedBox(
-                                height: 100,
-                                width: 100,
-                                child: Card(
-                                  elevation: 5,
-                                  surfaceTintColor: Color(0xffFFFFFF),
+                              GestureDetector(
+                                onTap: () {
+                                  addReport(context);
+                                },
+                                child: SizedBox(
+                                  height: 100,
+                                  width: 100,
+                                  child: Card(
+                                    elevation: 5,
+                                    surfaceTintColor: const Color(0xffFFFFFF),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        const Icon(Icons.report),
+                                        Text(
+                                          'Report',
+                                          style: Constants.titleRentify,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
                               SizedBox(
                                 height: 100,
                                 width: 100,
                                 child: Card(
-                                  elevation: 5,
-                                  surfaceTintColor: Colors.white,
-                                ),
+                                    elevation: 5,
+                                    surfaceTintColor: Colors.white,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Interested ',
+                                          style: Constants.titleRentify,
+                                        ),
+                                        Text(
+                                          widget.product.view!.length
+                                              .toString(),
+                                          style: Constants.titleRentify,
+                                        ),
+                                      ],
+                                    )),
                               )
                             ],
                           ),
@@ -320,9 +500,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          const Text(
-                            'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using \'Content here, content here\', making it look like readable English',
-                            style: TextStyle(
+                          Text(
+                            widget.product.description!,
+                            style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w400,
                               color: Colors.grey,
@@ -380,5 +560,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 }

@@ -434,6 +434,10 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                     ownerId: widget.product.ownerId,
                     ownerName: widget.product.ownerName,
                     ownerContact: widget.product.ownerContact,
+                    status: widget.product.status,
+                    reports: widget.product.reports,
+                    report: widget.product.report,
+                    view: widget.product.view,
                   );
 
                   ref

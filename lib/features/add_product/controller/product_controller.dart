@@ -5,7 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:rentify/core/provider/storage_provider.dart';
 import 'package:rentify/features/add_product/repository/product_repository.dart';
+import 'package:rentify/features/dashboard.dart/dashboard_screen.dart';
+import 'package:rentify/features/home/screen/home_screen.dart';
 import 'package:rentify/models/product.dart';
+import 'package:rentify/models/report.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/utility.dart';
@@ -83,13 +86,69 @@ class ProductController extends StateNotifier<bool> {
             ownerId: user.id,
             address: city,
             ownerName: user.name,
-            ownerContact: user.phoneNo);
+            ownerContact: user.phoneNo,
+            reports: 0,
+            status: 'inactive',
+            report: null,
+            view: []);
 
         final res = await _addProductRepository.addPost(products);
         res.fold((l) => showSnackBar(context, l.message), (r) {
           showSnackBar(context, 'Posted Successfully');
           // Routemaster.of(context).pop();
         });
+      },
+    );
+  }
+
+  void updateStatus({
+    required String id,
+    required String status,
+    required BuildContext context,
+  }) async {
+    state = true;
+
+    final res = await _addProductRepository.updateStatus(id, status);
+    state = false;
+    res.fold(
+      (l) => showSnackBar(context, l.message),
+      (r) {},
+    );
+  }
+
+  void deleteProduct({
+    required String id,
+    required BuildContext context,
+  }) async {
+    state = true;
+
+    final res = await _addProductRepository.deleteDocument(id);
+    state = false;
+    res.fold(
+      (l) => showSnackBar(context, l.message),
+      (r) => showSnackBar(context, 'delete successfully'),
+    );
+  }
+
+  void reportProduct({
+    required String id,
+    required Report report,
+    required BuildContext context,
+  }) async {
+    state = true;
+
+    final res = await _addProductRepository.reportProd(id, report);
+    state = false;
+    res.fold(
+      (l) {
+        print(l.message);
+        showSnackBar(context, l.message);
+      },
+      (r) {
+        showSnackBar(context, 'Report submitted');
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const DashBoard(),
+        ));
       },
     );
   }
@@ -128,5 +187,20 @@ class ProductController extends StateNotifier<bool> {
 
   Stream<List<Product>> fetchRenalProduct() {
     return _addProductRepository.fetchRentalProduct();
+  }
+
+  void updateView({
+    required String id,
+    required String userid,
+    required BuildContext context,
+  }) async {
+    state = true;
+
+    final res = await _addProductRepository.updateView(id: id, userid: userid);
+    state = false;
+    res.fold(
+      (l) => showSnackBar(context, l.message),
+      (r) {},
+    );
   }
 }

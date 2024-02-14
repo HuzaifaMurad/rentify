@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rentify/models/category.dart';
 
+enum Status {
+  active,
+  inactive,
+}
+
 class Constants {
   static const logo = 'assets/images/logo1.png';
   static const Color scaffoldbackgroundColor2 = Color(0xffE7E7E7);
@@ -37,7 +42,7 @@ class Constants {
   static var authText = GoogleFonts.deliusSwashCaps(
     fontSize: 30,
   );
-
+  static const adminPanelColor = Color(0xffF3F6F5);
   static const appBarGradient = LinearGradient(
     colors: [
       Color(0xff0ECEDA),

@@ -85,7 +85,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                     useMaterial3: true,
                   ),
                   // onGenerateRoute: (settings) => generateRoute(settings),
-                  home: const AdminLoginScreen(),
+                  home: const AdminPanelDashboard(),
                 ),
               );
             }

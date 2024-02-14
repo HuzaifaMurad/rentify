@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:rentify/features/add_product/controller/product_controller.dart';
 import 'package:rentify/features/rental/screens/widget/rentals_detail.dart';
 
@@ -37,7 +38,7 @@ class _RentalsScreenState extends ConsumerState<RentalsScreen> {
                 crossAxisCount: 2, // Number of columns in the grid
                 crossAxisSpacing: 10.0, // Spacing between columns
                 mainAxisSpacing: 10.0, // Spacing between rows
-                childAspectRatio: 0.8,
+                childAspectRatio: 0.78,
               ),
               itemCount: items.length, // Total number of items in the grid
               itemBuilder: (BuildContext context, int index) {
@@ -102,7 +103,11 @@ class _RentalsScreenState extends ConsumerState<RentalsScreen> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 5.0),
-                            child: Text(items[index].postedDate.toString()),
+                            child: Text(
+                              DateFormat('d MMMM yyyy').format(
+                                items[index].postedDate!,
+                              ),
+                            ),
                           ),
                         ],
                       ),

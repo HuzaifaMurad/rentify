@@ -8,9 +8,16 @@ import 'package:rentify/models/review.dart';
 
 import '../../../core/provider/storage_provider.dart';
 import '../../../core/utility.dart';
+import '../../../models/report.dart';
 import '../../../models/user_models.dart';
 import '../../auth/controller/auth_controller.dart';
+import '../../dashboard.dart/dashboard_screen.dart';
 import '../repository/user_profile_repository.dart';
+
+final userFetchProvider = StreamProvider((ref) {
+  final postController = ref.watch(userProfileControllerProvider.notifier);
+  return postController.fetchUsers();
+});
 
 final userProfileControllerProvider =
     StateNotifierProvider<UserProfileController, bool>(
@@ -87,6 +94,10 @@ class UserProfileController extends StateNotifier<bool> {
     );
   }
 
+  Stream<List<UserModel>> fetchUsers() {
+    return _userProfileRepository.fetchUsers();
+  }
+
   void addUserReview(String reviewUserId, Review review) async {
     try {
       // // Fetch the user being reviewed
@@ -112,5 +123,42 @@ class UserProfileController extends StateNotifier<bool> {
     } catch (e) {
       print('Error adding user review: $e');
     }
+  }
+
+  void updateStatus({
+    required String id,
+    required String status,
+    required BuildContext context,
+  }) async {
+    state = true;
+
+    final res = await _userProfileRepository.updateStatus(id, status);
+    state = false;
+    res.fold(
+      (l) => showSnackBar(context, l.message),
+      (r) {},
+    );
+  }
+
+  void reportUser({
+    required String id,
+    required Report report,
+    required BuildContext context,
+  }) async {
+    state = true;
+
+    final res = await _userProfileRepository.reportUser(id, report);
+    state = false;
+    res.fold(
+      (l) {
+        showSnackBar(context, l.message);
+      },
+      (r) {
+        showSnackBar(context, 'Report submitted');
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const DashBoard(),
+        ));
+      },
+    );
   }
 }

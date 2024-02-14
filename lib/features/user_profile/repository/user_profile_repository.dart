@@ -8,6 +8,7 @@ import '../../../core/constants/firebase_constants.dart';
 import '../../../core/failure.dart';
 import '../../../core/provider/firebase_provider.dart';
 import '../../../core/type_dfs.dart';
+import '../../../models/report.dart';
 import '../../../models/review.dart';
 import '../../../models/user_models.dart';
 import '../../auth/controller/auth_controller.dart';
@@ -32,6 +33,20 @@ class UserProfileRepository {
     try {
       return right(
         _users.doc(userModel.id).update(userModel.toMap()),
+      );
+    } on FirebaseException catch (e) {
+      throw e.message!;
+    } catch (e) {
+      return left(
+        Failure(e.toString()),
+      );
+    }
+  }
+
+  FutureVoid updateStatus(String id, String status) async {
+    try {
+      return right(
+        _users.doc(id).update({'status': status}),
       );
     } on FirebaseException catch (e) {
       throw e.message!;
@@ -97,6 +112,20 @@ class UserProfileRepository {
     }
   }
 
+  Stream<List<UserModel>> fetchUsers() {
+    var ss = _users.snapshots().map(
+          (event) => event.docs
+              .map(
+                (e) => UserModel.fromMap(
+                  e.data() as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+        );
+
+    return ss;
+  }
+
   FutureVoid addReview(String reviewedUserId, Review review) async {
     try {
       // Fetch the current user document
@@ -115,6 +144,33 @@ class UserProfileRepository {
         // Update the user document with the modified reviews list
         await _users.doc(reviewedUserId).update({
           'reviews': currentReviews,
+        }),
+      );
+    } on FirebaseException catch (e) {
+      throw e.message!;
+    } catch (e) {
+      return left(
+        Failure(e.toString()),
+      );
+    }
+  }
+
+  FutureVoid reportUser(String reportinguserid, Report review) async {
+    try {
+      // Fetch the current user document
+      DocumentSnapshot userSnapshot = await _users.doc(reportinguserid).get();
+
+      // Fetch the current reviews list
+      List<dynamic> currentReviews =
+          List<dynamic>.from(userSnapshot['report'] ?? []);
+
+      // Add the new review to the list
+      currentReviews.add(review.toMap());
+
+      return right(
+        // Update the user document with the modified reviews list
+        await _users.doc(reportinguserid).update({
+          'report': currentReviews,
         }),
       );
     } on FirebaseException catch (e) {
