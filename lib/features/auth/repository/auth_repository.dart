@@ -73,6 +73,7 @@ class AuthRepository {
           reviews: null,
           status: 'active',
           report: null,
+          cnic: '',
         );
         await users.doc(userCredential.user!.uid).set(userModel.toMap());
       } else {
@@ -94,6 +95,7 @@ class AuthRepository {
     String phone,
     File imageFile,
     String password,
+    String cnic,
     BuildContext context,
   ) async {
     String? profileImage;
@@ -128,6 +130,7 @@ class AuthRepository {
           ],
           reviews: null,
           report: null,
+          cnic: cnic,
           status: 'active');
       await users.doc(userCredential.user!.uid).set(userModel.toMap());
 

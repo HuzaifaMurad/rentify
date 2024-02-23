@@ -101,7 +101,9 @@ class _MyAppState extends ConsumerState<MyApp> {
                     useMaterial3: true,
                   ),
                   onGenerateRoute: (settings) => generateRoute(settings),
-                  home: const DashBoard(), // Use your logged-in route here
+                  home: userModel!.status == 'active'
+                      ? const DashBoard()
+                      : const Loaders(), // Use your logged-in route here
                 );
               }
             } else {

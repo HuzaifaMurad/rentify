@@ -1,15 +1,20 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'package:image_picker/image_picker.dart';
 import 'package:rentify/core/constants/constants.dart';
 import 'package:rentify/core/utility.dart';
 import 'package:rentify/features/auth/controller/auth_controller.dart';
 import 'package:rentify/features/auth/screen/fingerprint_screen.dart';
 import 'package:rentify/features/auth/screen/login_screen.dart';
 import 'package:rentify/features/dashboard.dart/dashboard_screen.dart';
-import 'package:rentify/features/home/screen/home_screen.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
 import '../widget/rounded_textfield.dart';
 import '../widget/terms_condition.dart';
@@ -28,8 +33,50 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final phonenoController = TextEditingController();
+  final cnicController = TextEditingController();
 
   File? profileImage;
+  File? _pickedImage;
+  String _recognizedText = '';
+  final ImagePicker _picker = ImagePicker();
+  final textRecognizer = TextRecognizer();
+
+  Future<void> _pickImage() async {
+    final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      setState(() {
+        _pickedImage = File(pickedImage.path);
+      });
+      _processImage();
+    }
+  }
+
+  Future<bool> _processImage() async {
+    if (_pickedImage == null) return false;
+
+    final inputImage = InputImage.fromFile(_pickedImage!);
+
+    final recognizedText = await textRecognizer.processImage(inputImage);
+    String stringToCheck = cnicController.text;
+    setState(() {
+      _recognizedText = recognizedText.text;
+    });
+
+    bool containsString = _recognizedText.contains(stringToCheck);
+
+    if (containsString) {
+      // Proceed further if the recognized text contains the string
+      // Add your further logic here
+      print(
+          "Recognized text contains the string '$stringToCheck'. Proceeding further...");
+      return true;
+    } else {
+      // Handle the case where the recognized text does not contain the string
+      print("Recognized text does not contain the string '$stringToCheck'.");
+      return false;
+    }
+  }
 
   void selectProfileImage() async {
     final res = await pickImage();
@@ -65,6 +112,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       showSnackBar(context, 'confirm password not equal to password');
       return;
     }
+    bool containsString = await _processImage();
+    if (containsString == false) {
+      showSnackBar(context, 'Your Cnic does not match');
+      return;
+    }
+    if (profileImage == null) {
+      showSnackBar(context, 'Choose profile image');
+      return;
+    }
+    showSnackBar(context, 'SUBMITTED');
 
     ref.read(authControllerProvider.notifier).signUpWithEmailAndPassword(
           name: fullNameController.text,
@@ -73,11 +130,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           imageFile: profileImage!,
           password: passwordController.text,
           context: context,
+          cnic: cnicController.text,
         );
     showSnackBar(context, 'account Registered');
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => const DashBoard(),
-    ));
+    // Navigator.of(context).push(MaterialPageRoute(
+    //   builder: (context) => const DashBoard(),
+    // ));
   }
 
   @override
@@ -243,6 +301,41 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       name: 'Phone No.',
                     ),
                     SizedBox(
+                      height: height * 0.015,
+                    ),
+                    Text(
+                      'Cnic',
+                      style: GoogleFonts.raleway(fontWeight: FontWeight.w600),
+                    ),
+                    RoundedTextField(
+                      controller: cnicController,
+                      name: 'Cnic.',
+                    ),
+                    SizedBox(
+                      height: height * 0.03,
+                    ),
+                    Text(
+                      'Upload Cnic photo',
+                      style: GoogleFonts.raleway(fontWeight: FontWeight.w600),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        _pickImage();
+                      },
+                      child: Container(
+                        height: 120,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(color: Colors.grey)),
+                        child: _pickedImage != null
+                            ? Image.file(
+                                _pickedImage!,
+                              )
+                            : Center(child: Text('No image selected')),
+                      ),
+                    ),
+                    SizedBox(
                       height: height * 0.03,
                     ),
                     GestureDetector(
@@ -298,5 +391,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     passwordController.dispose();
     confirmPasswordController.dispose();
     phonenoController.dispose();
+    textRecognizer.close();
   }
 }

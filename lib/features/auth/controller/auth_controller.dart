@@ -58,10 +58,18 @@ class AuthController extends StateNotifier<bool> {
     required String phone,
     required File imageFile,
     required String password,
+    required String cnic,
     required BuildContext context,
   }) async {
     _authRepository.signUpWithEmailAndPassword(
-        email, name, phone, imageFile, password, context);
+      email,
+      name,
+      phone,
+      imageFile,
+      password,
+      cnic,
+      context,
+    );
   }
 
   Stream<UserModel?> getUSerData(String uid) {

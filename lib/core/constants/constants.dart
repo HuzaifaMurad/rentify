@@ -14,7 +14,7 @@ class Constants {
   static List<Categorys> categories = [
     Categorys(title: 'House', icon: 'assets/images/house.png'),
     Categorys(title: 'Books', icon: 'assets/images/books.png'),
-    Categorys(title: 'Vachile', icon: 'assets/images/car.png'),
+    Categorys(title: 'Vehicle', icon: 'assets/images/car.png'),
     Categorys(title: 'Bike', icon: 'assets/images/bike.png'),
     Categorys(title: 'Clothes', icon: 'assets/images/shirt.png'),
     Categorys(title: 'Furniture', icon: 'assets/images/furniture.png'),
@@ -24,7 +24,7 @@ class Constants {
     Categorys(title: 'All', icon: 'assets/images/all.png'),
     Categorys(title: 'House', icon: 'assets/images/house.png'),
     Categorys(title: 'Books', icon: 'assets/images/books.png'),
-    Categorys(title: 'Vachile', icon: 'assets/images/car.png'),
+    Categorys(title: 'Vehicle', icon: 'assets/images/car.png'),
     Categorys(title: 'Bike', icon: 'assets/images/bike.png'),
     Categorys(title: 'Clothes', icon: 'assets/images/shirt.png'),
     Categorys(title: 'Furniture', icon: 'assets/images/furniture.png'),
